@@ -1,10 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
+import { Test, TestingModule } from '@nestjs/testing'
 import * as request from 'supertest'
 import { AppModule } from '../../src/app.module'
+import { setEnv } from '../helper/env'
 
 describe('api e2e', () => {
   let app: INestApplication
+
+  beforeAll(() => {
+    setEnv()
+  })
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
