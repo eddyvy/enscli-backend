@@ -74,6 +74,22 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
     expect(mockBlobClient.upload).toHaveBeenNthCalledWith(1, testFile, 4842)
   })
 
+  it('Should return 400 with not supported file extension', async () => {
+    const testFilePath = path.join(__dirname, '../../data/example.exe')
+    fs.readFileSync(testFilePath)
+
+    const res = await request(app.getHttpServer())
+      .post(url('testing_proj'))
+      .attach('file', testFilePath)
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      statusCode: 400,
+      message: 'File extension not supported',
+      error: 'Bad Request',
+    })
+  })
+
   it('Should return 400 with no file', async () => {
     const res = await request(app.getHttpServer()).post(url('testing_proj'))
 
