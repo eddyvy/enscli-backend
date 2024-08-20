@@ -1,5 +1,5 @@
 import { BlobServiceClient, BlockBlobClient } from '@azure/storage-blob'
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { ConfigService } from '../config'
 
 @Injectable()
@@ -38,7 +38,7 @@ export class BlobService {
     )
 
     if (!(await containerClient.exists()))
-      throw new Error('Azure container does not exist')
+      throw new InternalServerErrorException('Azure container does not exist')
 
     return containerClient.getBlockBlobClient(blobPath)
   }

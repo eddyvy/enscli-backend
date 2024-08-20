@@ -19,7 +19,7 @@ export class MultipartInterceptor implements NestInterceptor {
       throw new BadRequestException('multipart/form-data is required')
 
     const multipartData = await req.file()
-    if (!multipartData) throw new BadRequestException('file exected')
+    if (!multipartData) throw new BadRequestException('file required')
 
     req['multipart_data'] = multipartData
 

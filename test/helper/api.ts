@@ -14,6 +14,8 @@ export async function initTest(): Promise<
     imports: [AppModule],
   }).compile()
 
+  moduleFixture.useLogger(false)
+
   const app = moduleFixture.createNestApplication<NestFastifyApplication>(
     new FastifyAdapter()
   )
