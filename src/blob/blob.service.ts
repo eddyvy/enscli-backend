@@ -1,8 +1,4 @@
-import {
-  BlobServiceClient,
-  BlockBlobClient,
-  ContainerClient,
-} from '@azure/storage-blob'
+import { BlobServiceClient, BlockBlobClient } from '@azure/storage-blob'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '../config'
 
@@ -16,9 +12,15 @@ export class BlobService {
     this.containerName = config.AZURE_STORAGE.CONTAINER_NAME
   }
 
-  async saveBlob(content: Blob, blobPath: string): Promise<void> {
+  async saveBlob(content: Blob | Buffer, blobPath: string): Promise<void> {
     const blobClient = await this.getBlobClient(blobPath)
-    await blobClient.upload(content, content.size)
+    let size = 0
+    if (content instanceof Blob) {
+      size = content.size
+    } else {
+      size = content.byteLength
+    }
+    await blobClient.upload(content, size)
   }
 
   async getBlob(blobPath: string): Promise<Blob> {

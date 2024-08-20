@@ -72,11 +72,41 @@ describe('BlobService', () => {
       'project/test.txt'
     )
     expect(mockBlobClient.upload).toHaveBeenCalledTimes(1)
-    expect(mockBlobClient.upload).toHaveBeenNthCalledWith(
+    expect(mockBlobClient.upload).toHaveBeenNthCalledWith(1, content, 4)
+  })
+
+  it('saveBlob works correctly with buffer', async () => {
+    mockContainerClient.exists.mockResolvedValue(true)
+
+    const content = Buffer.from('test')
+    const blobPath = 'project/test.txt'
+
+    let error = null
+    try {
+      await service.saveBlob(content, blobPath)
+    } catch (err) {
+      error = err
+    }
+
+    expect(error).toBeNull()
+    expect(mockFromConnectionString).toHaveBeenCalledTimes(1)
+    expect(mockFromConnectionString).toHaveBeenNthCalledWith(
       1,
-      content,
-      content.size
+      'connection-string'
     )
+    expect(mockServiceClient.getContainerClient).toHaveBeenCalledTimes(1)
+    expect(mockServiceClient.getContainerClient).toHaveBeenNthCalledWith(
+      1,
+      'container-name'
+    )
+    expect(mockContainerClient.exists).toHaveBeenCalledTimes(1)
+    expect(mockContainerClient.getBlockBlobClient).toHaveBeenCalledTimes(1)
+    expect(mockContainerClient.getBlockBlobClient).toHaveBeenNthCalledWith(
+      1,
+      'project/test.txt'
+    )
+    expect(mockBlobClient.upload).toHaveBeenCalledTimes(1)
+    expect(mockBlobClient.upload).toHaveBeenNthCalledWith(1, content, 4)
   })
 
   it('saveBlob throws error when container does not exist', async () => {
