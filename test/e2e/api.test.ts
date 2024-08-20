@@ -1,7 +1,6 @@
 import { INestApplication } from '@nestjs/common'
-import { Test, TestingModule } from '@nestjs/testing'
 import * as request from 'supertest'
-import { AppModule } from '../../src/app.module'
+import { initTest } from '../helper/api'
 import { setEnv } from '../helper/env'
 
 describe('api e2e', () => {
@@ -12,12 +11,7 @@ describe('api e2e', () => {
   })
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile()
-
-    app = moduleFixture.createNestApplication()
-    await app.init()
+    app = await initTest()
   })
 
   it('GET /health should return 200 status up', async () => {
