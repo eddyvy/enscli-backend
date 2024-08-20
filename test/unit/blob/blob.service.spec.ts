@@ -53,7 +53,7 @@ describe('BlobService', () => {
     expect(mockFromConnectionString).toHaveBeenCalledTimes(1)
     expect(mockFromConnectionString).toHaveBeenNthCalledWith(
       1,
-      'connection-string',
+      'connection-string'
     )
     expect(mockGetContainerClient).toHaveBeenCalledTimes(1)
     expect(mockGetContainerClient).toHaveBeenNthCalledWith(1, 'container-name')
@@ -61,7 +61,7 @@ describe('BlobService', () => {
     expect(mockGetBlockBlobClient).toHaveBeenCalledTimes(1)
     expect(mockGetBlockBlobClient).toHaveBeenNthCalledWith(
       1,
-      'project/test.txt',
+      'project/test.txt'
     )
     expect(mockUpload).toHaveBeenCalledTimes(1)
     expect(mockUpload).toHaveBeenNthCalledWith(1, content, content.size)
