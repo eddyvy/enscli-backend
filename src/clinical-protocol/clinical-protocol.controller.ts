@@ -4,12 +4,15 @@ import {
   Controller,
   Param,
   Post,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
+import { AuthGuard } from '../auth'
 import { BlobService } from '../blob'
 import { MultipartData, MultipartInterceptor } from '../multipart'
 import { ClinicalProtocolService } from './clinical-protocol.service'
 
+@UseGuards(AuthGuard)
 @Controller('clinical-protocol')
 export class ClinicalProtocolController {
   private readonly ERR_MSG_FILE_EXTENSION_NOT_SUPPORTED =

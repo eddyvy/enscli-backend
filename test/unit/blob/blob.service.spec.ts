@@ -1,4 +1,5 @@
 import { BlobServiceClient } from '@azure/storage-blob'
+import { InternalServerErrorException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { BlobService } from '../../../src/blob'
 import { ConfigModule } from '../../../src/config'
@@ -122,7 +123,9 @@ describe('BlobService', () => {
       error = err
     }
 
-    expect(error).toEqual(new Error('Azure container does not exist'))
+    expect(error).toEqual(
+      new InternalServerErrorException('Azure container does not exist')
+    )
   })
 
   it('getBlob works correctly', async () => {
@@ -166,6 +169,8 @@ describe('BlobService', () => {
       error = err
     }
 
-    expect(error).toEqual(new Error('Azure container does not exist'))
+    expect(error).toEqual(
+      new InternalServerErrorException('Azure container does not exist')
+    )
   })
 })

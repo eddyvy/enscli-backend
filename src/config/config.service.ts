@@ -2,10 +2,18 @@ import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class ConfigService {
+  AUTH: {
+    USERS: string
+    PASSWORD: string
+  }
   AZURE_STORAGE: { CONNECTION_STRING: string; CONTAINER_NAME: string }
   LLAMA_CLOUD: { API_KEY: string; API_URL: string }
 
   constructor() {
+    this.AUTH = {
+      USERS: this.getOrThrow('AUTH_USERS'),
+      PASSWORD: this.getOrThrow('AUTH_PASSWORD'),
+    }
     this.AZURE_STORAGE = {
       CONNECTION_STRING: this.getOrThrow('AZURE_STORAGE_CONNECTION_STRING'),
       CONTAINER_NAME: this.getOrThrow('AZURE_STORAGE_CONTAINER_NAME'),

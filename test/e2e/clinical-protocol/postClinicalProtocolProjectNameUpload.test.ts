@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as request from 'supertest'
 import { initTest } from '../../helper/api'
+import { authHeader } from '../../helper/auth'
 import { setEnv } from '../../helper/env'
 
 jest.mock('@azure/storage-blob')
@@ -49,6 +50,7 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
 
     const res = await request(app.getHttpServer())
       .post(url('testing_proj'))
+      .set(authHeader)
       .attach('file', testFilePath)
 
     expect(res.status).toBe(201)
@@ -80,6 +82,7 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
 
     const res = await request(app.getHttpServer())
       .post(url('testing_proj'))
+      .set(authHeader)
       .attach('file', testFilePath)
 
     expect(res.status).toBe(400)
@@ -91,13 +94,27 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
   })
 
   it('Should return 400 with no file', async () => {
-    const res = await request(app.getHttpServer()).post(url('testing_proj'))
+    const res = await request(app.getHttpServer())
+      .post(url('testing_proj'))
+      .set(authHeader)
 
     expect(res.status).toBe(400)
     expect(res.body).toEqual({
       statusCode: 400,
       message: 'multipart/form-data is required',
       error: 'Bad Request',
+    })
+  })
+
+  it('Should return 401 with invalid auth', async () => {
+    const res = await request(app.getHttpServer())
+      .post(url('testing_proj'))
+      .set({ Authorization: 'Basic invalid_auth' })
+
+    expect(res.status).toBe(401)
+    expect(res.body).toEqual({
+      statusCode: 401,
+      message: 'Unauthorized',
     })
   })
 
@@ -108,6 +125,7 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
 
     const res = await request(app.getHttpServer())
       .post(url('testing_proj'))
+      .set(authHeader)
       .attach('file', testFilePath)
 
     expect(res.status).toBe(500)
