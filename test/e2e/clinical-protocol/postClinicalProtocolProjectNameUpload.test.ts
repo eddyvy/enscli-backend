@@ -1,7 +1,5 @@
 import { BlobServiceClient } from '@azure/storage-blob'
 import { INestApplication } from '@nestjs/common'
-import * as fs from 'fs'
-import * as path from 'path'
 import * as request from 'supertest'
 import { initTest } from '../../helper/api'
 import { authHeader } from '../../helper/auth'
@@ -30,6 +28,8 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
     BlobServiceClient.fromConnectionString as jest.Mock
   mockFromConnectionString.mockReturnValue(mockServiceClient)
 
+  const testFile = Buffer.from('example file content')
+
   beforeAll(() => {
     setEnv()
   })
@@ -45,13 +45,13 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
   it('Should return 201 with correct response', async () => {
     mockContainerClient.exists.mockResolvedValue(true)
 
-    const testFilePath = path.join(__dirname, '../../data/example.pdf')
-    const testFile = fs.readFileSync(testFilePath)
-
     const res = await request(app.getHttpServer())
       .post(url('testing_proj'))
       .set(authHeader)
-      .attach('file', testFilePath)
+      .attach('file', testFile, {
+        contentType: 'multipart/form-data',
+        filename: 'example.pdf',
+      })
 
     expect(res.status).toBe(201)
     expect(res.body).toEqual({ success: true })
@@ -73,17 +73,17 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
       'testing_proj/example.pdf'
     )
     expect(mockBlobClient.upload).toHaveBeenCalledTimes(1)
-    expect(mockBlobClient.upload).toHaveBeenNthCalledWith(1, testFile, 4842)
+    expect(mockBlobClient.upload).toHaveBeenNthCalledWith(1, testFile, 20)
   })
 
   it('Should return 400 with not supported file extension', async () => {
-    const testFilePath = path.join(__dirname, '../../data/example.exe')
-    fs.readFileSync(testFilePath)
-
     const res = await request(app.getHttpServer())
       .post(url('testing_proj'))
       .set(authHeader)
-      .attach('file', testFilePath)
+      .attach('file', testFile, {
+        contentType: 'multipart/form-data',
+        filename: 'example.exe',
+      })
 
     expect(res.status).toBe(400)
     expect(res.body).toEqual({
@@ -110,6 +110,10 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
     const res = await request(app.getHttpServer())
       .post(url('testing_proj'))
       .set({ Authorization: 'Basic invalid_auth' })
+      .attach('file', testFile, {
+        contentType: 'multipart/form-data',
+        filename: 'example.pdf',
+      })
 
     expect(res.status).toBe(401)
     expect(res.body).toEqual({
@@ -121,12 +125,13 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
   it('Should return 500 with no container', async () => {
     mockContainerClient.exists.mockResolvedValue(false)
 
-    const testFilePath = path.join(__dirname, '../../data/example.pdf')
-
     const res = await request(app.getHttpServer())
       .post(url('testing_proj'))
       .set(authHeader)
-      .attach('file', testFilePath)
+      .attach('file', testFile, {
+        contentType: 'multipart/form-data',
+        filename: 'example.pdf',
+      })
 
     expect(res.status).toBe(500)
     expect(res.body).toEqual({

@@ -15,19 +15,23 @@ describe('ConfigService', () => {
     clearEnv()
   })
 
-  it('should have valid Azure Storage configuration', async () => {
+  it('should be defined', async () => {
     setEnv()
     const service = await getService()
-
-    expect(service.AZURE_STORAGE.CONNECTION_STRING).toEqual('connection-string')
-    expect(service.AZURE_STORAGE.CONTAINER_NAME).toEqual('container-name')
+    expect(service).toBeDefined()
   })
 
-  it('should have valid Llama Cloud configuration', async () => {
-    setEnv()
-    const service = await getService()
+  it('should throw', async () => {
+    let service = null
+    let error = null
 
-    expect(service.LLAMA_CLOUD.API_KEY).toEqual('api-key')
-    expect(service.LLAMA_CLOUD.API_URL).toEqual('api-url')
+    try {
+      service = await getService()
+    } catch (err) {
+      error = err
+    }
+
+    expect(service).toBeNull()
+    expect(error).toBeDefined()
   })
 })

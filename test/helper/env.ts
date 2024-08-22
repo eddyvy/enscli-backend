@@ -4,7 +4,7 @@ export function setEnv() {
   process.env.AZURE_STORAGE_CONNECTION_STRING = 'connection-string'
   process.env.AZURE_STORAGE_CONTAINER_NAME = 'container-name'
   process.env.LLAMA_CLOUD_API_KEY = 'api-key'
-  process.env.LLAMA_CLOUD_API_URL = 'api-url'
+  process.env.LLAMA_CLOUD_API_URL = 'http://api.url'
 }
 
 export function clearEnv() {
