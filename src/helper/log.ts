@@ -34,7 +34,7 @@ export const appFastifyLogger = fp(
       }
 
       log(
-        `${header} ${DateTime.now().toFormat('dd/MM/yyyy, HH:mm:ss')} - ${ipAddr} - "${req.method} ${req.url}" ${reply.statusCode} - ${elapsed}ms`
+        `${header} ${DateTime.now().toFormat('dd/MM/yyyy, HH:mm:ss')} - ${ipAddr} - ${reply.statusCode} - ${req.method} ${req.url} - ${elapsed}ms`
       )
 
       next()

@@ -13,7 +13,10 @@ import { ConfigModule } from './config'
     AppService,
     {
       provide: APP_PIPE,
-      useClass: ValidationPipe,
+      useValue: new ValidationPipe({
+        transform: true,
+        whitelist: true,
+      }),
     },
   ],
 })

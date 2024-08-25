@@ -4,29 +4,17 @@ import * as request from 'supertest'
 import { initTest } from '../../helper/api'
 import { authHeader } from '../../helper/auth'
 import { setEnv } from '../../helper/env'
+import { mockAzureStorageBlob } from '../../mocks/azure-storage-blob'
 
 jest.mock('@azure/storage-blob')
+const mockFrom = BlobServiceClient.fromConnectionString as jest.Mock
+mockFrom.mockImplementation(mockAzureStorageBlob.fromConnectionString)
 
 describe('POST /clinical-protocl/:project_name/upload', () => {
   const url = (projectName: string) =>
     `/clinical-protocol/${projectName}/upload`
 
   let app: INestApplication
-
-  const mockBlobClient = {
-    upload: jest.fn(),
-    download: jest.fn(),
-  }
-  const mockContainerClient = {
-    getBlockBlobClient: jest.fn(() => mockBlobClient),
-    exists: jest.fn(),
-  }
-  const mockServiceClient = {
-    getContainerClient: jest.fn(() => mockContainerClient),
-  }
-  const mockFromConnectionString =
-    BlobServiceClient.fromConnectionString as jest.Mock
-  mockFromConnectionString.mockReturnValue(mockServiceClient)
 
   const testFile = Buffer.from('example file content')
 
@@ -43,7 +31,7 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
   })
 
   it('Should return 201 with correct response', async () => {
-    mockContainerClient.exists.mockResolvedValue(true)
+    mockAzureStorageBlob.exists.mockResolvedValue(true)
 
     const res = await request(app.getHttpServer())
       .post(url('testing_proj'))
@@ -56,24 +44,24 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
     expect(res.status).toBe(201)
     expect(res.body).toEqual({ success: true })
 
-    expect(mockFromConnectionString).toHaveBeenCalledTimes(1)
-    expect(mockFromConnectionString).toHaveBeenNthCalledWith(
+    expect(mockAzureStorageBlob.fromConnectionString).toHaveBeenCalledTimes(1)
+    expect(mockAzureStorageBlob.fromConnectionString).toHaveBeenNthCalledWith(
       1,
       'connection-string'
     )
-    expect(mockServiceClient.getContainerClient).toHaveBeenCalledTimes(1)
-    expect(mockServiceClient.getContainerClient).toHaveBeenNthCalledWith(
+    expect(mockAzureStorageBlob.getContainerClient).toHaveBeenCalledTimes(1)
+    expect(mockAzureStorageBlob.getContainerClient).toHaveBeenNthCalledWith(
       1,
       'container-name'
     )
-    expect(mockContainerClient.exists).toHaveBeenCalledTimes(1)
-    expect(mockContainerClient.getBlockBlobClient).toHaveBeenCalledTimes(1)
-    expect(mockContainerClient.getBlockBlobClient).toHaveBeenNthCalledWith(
+    expect(mockAzureStorageBlob.exists).toHaveBeenCalledTimes(1)
+    expect(mockAzureStorageBlob.getBlockBlobClient).toHaveBeenCalledTimes(1)
+    expect(mockAzureStorageBlob.getBlockBlobClient).toHaveBeenNthCalledWith(
       1,
       'testing_proj/example.pdf'
     )
-    expect(mockBlobClient.upload).toHaveBeenCalledTimes(1)
-    expect(mockBlobClient.upload).toHaveBeenNthCalledWith(1, testFile, 20)
+    expect(mockAzureStorageBlob.upload).toHaveBeenCalledTimes(1)
+    expect(mockAzureStorageBlob.upload).toHaveBeenNthCalledWith(1, testFile, 20)
   })
 
   it('Should return 400 with not supported file extension', async () => {
@@ -123,7 +111,7 @@ describe('POST /clinical-protocl/:project_name/upload', () => {
   })
 
   it('Should return 500 with no container', async () => {
-    mockContainerClient.exists.mockResolvedValue(false)
+    mockAzureStorageBlob.exists.mockResolvedValue(false)
 
     const res = await request(app.getHttpServer())
       .post(url('testing_proj'))

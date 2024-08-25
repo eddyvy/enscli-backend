@@ -26,7 +26,12 @@ export class BlobService {
   async getBlob(blobPath: string): Promise<Blob> {
     const blobClient = await this.getBlobClient(blobPath)
     const downloadBlockBlobResponse = await blobClient.download()
-    return downloadBlockBlobResponse.blobBody
+
+    const blobBody = await this.streamToBlob(
+      downloadBlockBlobResponse.readableStreamBody
+    )
+
+    return blobBody
   }
 
   private async getBlobClient(blobPath: string): Promise<BlockBlobClient> {
@@ -36,10 +41,34 @@ export class BlobService {
     const containerClient = blobServiceClient.getContainerClient(
       this.containerName
     )
-
     if (!(await containerClient.exists()))
       throw new InternalServerErrorException('Azure container does not exist')
 
     return containerClient.getBlockBlobClient(blobPath)
+  }
+
+  private async streamToBlob(
+    readableStream?: NodeJS.ReadableStream | null
+  ): Promise<Blob> {
+    if (!readableStream) {
+      throw new Error('ReadableStream is null')
+    }
+
+    const chunks: any[] = []
+
+    return new Promise<Blob>((resolve, reject) => {
+      readableStream.on('data', (chunk) => {
+        chunks.push(chunk)
+      })
+
+      readableStream.on('end', () => {
+        const blob = new Blob(chunks)
+        resolve(blob)
+      })
+
+      readableStream.on('error', (err) => {
+        reject(err)
+      })
+    })
   }
 }
