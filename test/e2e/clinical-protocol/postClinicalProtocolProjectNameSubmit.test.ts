@@ -1,6 +1,6 @@
 import { BlobServiceClient } from '@azure/storage-blob'
 import { INestApplication } from '@nestjs/common'
-import * as request from 'supertest'
+import request from 'supertest'
 import { initTest } from '../../helper/api'
 import { authHeader } from '../../helper/auth'
 import { setEnv } from '../../helper/env'

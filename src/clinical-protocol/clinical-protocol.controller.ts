@@ -12,7 +12,11 @@ import { AuthGuard } from '../auth'
 import { BlobService } from '../blob'
 import { MultipartData, MultipartInterceptor } from '../multipart'
 import { ClinicalProtocolService } from './clinical-protocol.service'
-import { ClinicalProtocolParseDto, ClinicalProtocolSubmitDto } from './dto'
+import {
+  ClinicalProtocolChunkDto,
+  ClinicalProtocolParseDto,
+  ClinicalProtocolSubmitDto,
+} from './dto'
 
 @UseGuards(AuthGuard)
 @Controller('clinical-protocol')
@@ -21,7 +25,7 @@ export class ClinicalProtocolController {
     'File extension not supported'
   private readonly ERR_MSG_FILE_PARSE_TEXT =
     'Parsing is not necessary for text files'
-  private readonly ERR_MSG_FILE_SUBMIT_NO_TEXT = 'Submit needs a text file'
+  private readonly ERR_MSG_FILE_SUBMIT_NO_TEXT = 'Needs a text file'
   private readonly SUPPORTED_EXTENSIONS = [
     'pdf',
     'txt',
@@ -136,10 +140,22 @@ export class ClinicalProtocolController {
     @Body() dto: ClinicalProtocolSubmitDto
   ) {
     if (!dto.filename || !this.TEXT_EXTENSIONS.includes(dto.getFileExtension()))
-      throw new BadRequestException(this.ERR_MSG_FILE_EXTENSION_NOT_SUPPORTED)
+      throw new BadRequestException(this.ERR_MSG_FILE_SUBMIT_NO_TEXT)
 
     await this.clinicalProtocolService.submit(projectName, dto)
     return { success: true }
+  }
+
+  @Post('/:project_name/chunk')
+  async postClinicalProtocolProjectNameChunk(
+    @Param('project_name') projectName: string,
+    @Body() dto: ClinicalProtocolChunkDto
+  ) {
+    if (!dto.filename || !this.TEXT_EXTENSIONS.includes(dto.getFileExtension()))
+      throw new BadRequestException(this.ERR_MSG_FILE_SUBMIT_NO_TEXT)
+
+    const chunks = await this.clinicalProtocolService.chunk(projectName, dto)
+    return { chunks }
   }
 
   private checkFileExtension(filename?: string) {

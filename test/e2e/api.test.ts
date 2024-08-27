@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common'
-import * as request from 'supertest'
+import request from 'supertest'
 import { initTest } from '../helper/api'
 import { setEnv } from '../helper/env'
 

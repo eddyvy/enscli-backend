@@ -1,7 +1,7 @@
 import { HttpModule } from '@nestjs/axios'
 import { InternalServerErrorException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import * as nock from 'nock'
+import nock from 'nock'
 import { ConfigModule } from '../../../src/config'
 import { sleep } from '../../../src/helper/time'
 import { ParserService } from '../../../src/parser'

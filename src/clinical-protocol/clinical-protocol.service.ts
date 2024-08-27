@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common'
 import { BlobService } from '../blob'
+import { ChunkService } from '../chunk'
 import { ParserService } from '../parser'
-import { ClinicalProtocolParseDto, ClinicalProtocolSubmitDto } from './dto'
+import {
+  ClinicalProtocolChunkDto,
+  ClinicalProtocolParseDto,
+  ClinicalProtocolSubmitDto,
+} from './dto'
 
 @Injectable()
 export class ClinicalProtocolService {
   constructor(
     private readonly blobService: BlobService,
-    private readonly parserService: ParserService
+    private readonly parserService: ParserService,
+    private readonly chunkService: ChunkService
   ) {}
 
   async parse(projectName: string, dto: ClinicalProtocolParseDto) {
@@ -33,5 +39,18 @@ export class ClinicalProtocolService {
       Buffer.from(dto.content),
       `${projectName}/${dto.filename}`
     )
+  }
+
+  async chunk(
+    projectName: string,
+    dto: ClinicalProtocolChunkDto
+  ): Promise<string[]> {
+    const fileBlob = await this.blobService.getBlob(
+      `${projectName}/${dto.filename}`
+    )
+    const content = await fileBlob.text()
+    const chunks = await this.chunkService.createChunks(content)
+
+    return chunks
   }
 }

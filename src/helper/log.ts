@@ -1,4 +1,4 @@
-import * as fp from 'fastify-plugin'
+import fp from 'fastify-plugin'
 import { DateTime } from 'luxon'
 
 const symbolNow = Symbol('RequestTimer')
