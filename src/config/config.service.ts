@@ -11,6 +11,10 @@ export class ConfigService {
     USERS: string
     PASSWORD: string
   }
+  DB: {
+    PATH: string
+    MIGRATIONS_PATH: string
+  }
   EMBEDDING_MODEL_DEFAULT: string
   LLAMA_CLOUD: { API_KEY: string; API_URL: string }
   STORAGE: {
@@ -28,6 +32,10 @@ export class ConfigService {
       API_AUTH_PASSWORD: this.getOrThrow(
         'ENSCLI_AI_MANAGER_BASIC_AUTH_PASSWORD'
       ),
+    }
+    this.DB = {
+      PATH: this.getOrThrow('DATABASE_PATH'),
+      MIGRATIONS_PATH: this.getOrThrow('DATABASE_MIGRATIONS_PATH'),
     }
     this.AUTH = {
       USERS: this.getOrThrow('BASIC_AUTH_USERS'),

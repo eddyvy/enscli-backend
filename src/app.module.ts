@@ -5,9 +5,10 @@ import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
 import { ClinicalProtocolModule } from './clinical-protocol'
 import { ConfigModule } from './config'
+import { DatabaseModule } from './database/database.module'
 
 @Module({
-  imports: [ConfigModule, AuthModule, ClinicalProtocolModule],
+  imports: [ConfigModule, AuthModule, DatabaseModule, ClinicalProtocolModule],
   controllers: [AppController],
   providers: [
     AppService,
