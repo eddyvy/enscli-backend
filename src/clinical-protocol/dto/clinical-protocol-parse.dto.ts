@@ -17,7 +17,7 @@ export class ClinicalProtocolParseDto {
     return this.filename.split('.').at(-1)
   }
 
-  getFileNameWithTxtExtension() {
-    return this.filename.replace(/\.[^/.]+$/, '.txt')
+  getFileNameWithExtension(extension: string) {
+    return this.filename.replace(/\.[^/.]+$/, '.' + extension)
   }
 }

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common'
-import { BlobModule } from '../blob'
-import { ChunkModule } from '../chunk'
+import { EmbedModule } from '../embed'
 import { ParserModule } from '../parser'
+import { StorageModule } from '../storage'
 import { ClinicalProtocolController } from './clinical-protocol.controller'
 import { ClinicalProtocolService } from './clinical-protocol.service'
 
 @Module({
-  imports: [BlobModule, ParserModule, ChunkModule],
+  imports: [StorageModule, ParserModule, EmbedModule],
   providers: [ClinicalProtocolService],
   controllers: [ClinicalProtocolController],
 })

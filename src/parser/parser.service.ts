@@ -27,7 +27,7 @@ export class ParserService {
   }
 
   async parseBinaryToText(
-    file: Blob,
+    file: Buffer,
     filename: string,
     lang?: string,
     parsing_instructions?: string
@@ -43,13 +43,13 @@ export class ParserService {
   }
 
   private async uploadBinaryToLlamaCloud(
-    file: Blob,
+    file: Buffer,
     filename: string,
     lang?: string,
     parsing_instructions?: string
   ): Promise<string> {
     const formData = new FormData()
-    formData.append('file', file, filename)
+    formData.append('file', new Blob([file]), filename)
 
     if (lang) formData.append('lang', lang)
     if (parsing_instructions)
@@ -103,7 +103,7 @@ export class ParserService {
   }
 
   private async downloadTextFromLlamaCloud(jobId: string): Promise<string> {
-    const getUrl = `${this.apiUrl}/parsing/job/${jobId}/result/raw/text`
+    const getUrl = `${this.apiUrl}/parsing/job/${jobId}/result/raw/markdown`
     const getHeaders = {
       Accept: 'application/json',
       Authorization: `Bearer ${this.apiKey}`,

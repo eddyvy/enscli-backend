@@ -1,9 +1,10 @@
+import { MultipartFile } from '@fastify/multipart'
 import { Injectable } from '@nestjs/common'
-import { BlobService } from '../blob'
-import { ChunkService } from '../chunk'
+import { EmbedService } from '../embed'
 import { ParserService } from '../parser'
+import { StorageService } from '../storage'
 import {
-  ClinicalProtocolChunkDto,
+  ClinicalProtocolEmbedDto,
   ClinicalProtocolParseDto,
   ClinicalProtocolSubmitDto,
 } from './dto'
@@ -11,46 +12,51 @@ import {
 @Injectable()
 export class ClinicalProtocolService {
   constructor(
-    private readonly blobService: BlobService,
+    private readonly storageService: StorageService,
     private readonly parserService: ParserService,
-    private readonly chunkService: ChunkService
+    private readonly embedService: EmbedService
   ) {}
+
+  async upload(projectName: string, file: MultipartFile) {
+    await this.storageService.uploadFile(
+      file.file,
+      `${projectName}/${file.filename}`
+    )
+  }
 
   async parse(projectName: string, dto: ClinicalProtocolParseDto) {
     const filePath = `${projectName}/${dto.filename}`
-    const fileBlob = await this.blobService.getBlob(filePath)
+    const fileBuffer = await this.storageService.downloadFile(filePath)
     const textContent = await this.parserService.parseBinaryToText(
-      fileBlob,
+      fileBuffer,
       dto.filename,
       dto.lang,
       dto.parsing_instructions
     )
 
-    await this.blobService.saveBlob(
+    await this.storageService.uploadFile(
       Buffer.from(textContent),
-      `${projectName}/parsed_${dto.getFileNameWithTxtExtension()}`
+      `${projectName}/parsed_${dto.getFileNameWithExtension('md')}`
     )
 
     return textContent
   }
 
   async submit(projectName: string, dto: ClinicalProtocolSubmitDto) {
-    await this.blobService.saveBlob(
+    await this.storageService.uploadFile(
       Buffer.from(dto.content),
       `${projectName}/${dto.filename}`
     )
   }
 
-  async chunk(
-    projectName: string,
-    dto: ClinicalProtocolChunkDto
-  ): Promise<string[]> {
-    const fileBlob = await this.blobService.getBlob(
-      `${projectName}/${dto.filename}`
-    )
-    const content = await fileBlob.text()
-    const chunks = await this.chunkService.createChunks(content)
+  async embed(projectName: string, dto: ClinicalProtocolEmbedDto) {
+    const filePath = `${projectName}/${dto.filename}`
+    const fileBuffer = await this.storageService.downloadFile(filePath)
 
-    return chunks
+    await this.embedService.embed(
+      new Blob([fileBuffer]),
+      projectName,
+      dto.model
+    )
   }
 }

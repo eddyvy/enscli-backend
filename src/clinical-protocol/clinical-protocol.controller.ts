@@ -9,11 +9,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { AuthGuard } from '../auth'
-import { BlobService } from '../blob'
 import { MultipartData, MultipartInterceptor } from '../multipart'
 import { ClinicalProtocolService } from './clinical-protocol.service'
 import {
-  ClinicalProtocolChunkDto,
+  ClinicalProtocolEmbedDto,
   ClinicalProtocolParseDto,
   ClinicalProtocolSubmitDto,
 } from './dto'
@@ -101,26 +100,24 @@ export class ClinicalProtocolController {
   private readonly TEXT_EXTENSIONS = ['txt', 'md', 'csv']
 
   constructor(
-    private readonly blobService: BlobService,
     private readonly clinicalProtocolService: ClinicalProtocolService
   ) {}
 
   @UseInterceptors(MultipartInterceptor)
-  @Post('/:project_name/upload')
+  @Post('/:project/upload')
   async postClinicalProtocolProjectNameUpload(
     @MultipartData('file') file: MultipartFile,
-    @Param('project_name') projectName: string
+    @Param('project') projectName: string
   ) {
     this.checkFileExtension(file?.filename)
 
-    const buffer = await file.toBuffer()
-    await this.blobService.saveBlob(buffer, `${projectName}/${file.filename}`)
+    await this.clinicalProtocolService.upload(projectName, file)
     return { success: true }
   }
 
-  @Post('/:project_name/parse')
+  @Post('/:project/parse')
   async postClinicalProtocolProjectNameParse(
-    @Param('project_name') projectName: string,
+    @Param('project') projectName: string,
     @Body() dto: ClinicalProtocolParseDto
   ) {
     this.checkFileExtension(dto.filename)
@@ -134,9 +131,9 @@ export class ClinicalProtocolController {
     return { content: parsedContent }
   }
 
-  @Post('/:project_name/submit')
+  @Post('/:project/submit')
   async postClinicalProtocolProjectNameSubmit(
-    @Param('project_name') projectName: string,
+    @Param('project') projectName: string,
     @Body() dto: ClinicalProtocolSubmitDto
   ) {
     if (!dto.filename || !this.TEXT_EXTENSIONS.includes(dto.getFileExtension()))
@@ -146,16 +143,16 @@ export class ClinicalProtocolController {
     return { success: true }
   }
 
-  @Post('/:project_name/chunk')
-  async postClinicalProtocolProjectNameChunk(
-    @Param('project_name') projectName: string,
-    @Body() dto: ClinicalProtocolChunkDto
+  @Post('/:project/embed')
+  async postClinicalProtocolProjectNameEmbed(
+    @Param('project') projectName: string,
+    @Body() dto: ClinicalProtocolEmbedDto
   ) {
     if (!dto.filename || !this.TEXT_EXTENSIONS.includes(dto.getFileExtension()))
       throw new BadRequestException(this.ERR_MSG_FILE_SUBMIT_NO_TEXT)
 
-    const chunks = await this.clinicalProtocolService.chunk(projectName, dto)
-    return { chunks }
+    await this.clinicalProtocolService.embed(projectName, dto)
+    return { success: true }
   }
 
   private checkFileExtension(filename?: string) {
