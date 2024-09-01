@@ -19,21 +19,22 @@ export class DatabaseService {
   async setUpDb(): Promise<void> {
     this.db = new sqlite3.Database(this.databasePath)
 
-    let migrationFiles = fs.readdirSync(this.migrationsPath)
-    migrationFiles = migrationFiles.sort((a, b) => {
-      const aNum = parseInt(a.split('_')[0], 10)
-      const bNum = parseInt(b.split('_')[0], 10)
-      return aNum - bNum
-    })
+    // TODO Implement when a db is needed
+    // let migrationFiles = fs.readdirSync(this.migrationsPath)
+    // migrationFiles = migrationFiles.sort((a, b) => {
+    //   const aNum = parseInt(a.split('_')[0], 10)
+    //   const bNum = parseInt(b.split('_')[0], 10)
+    //   return aNum - bNum
+    // })
 
-    for (const file of migrationFiles) {
-      const filePath = path.join(this.migrationsPath, file)
-      const sql = fs.readFileSync(filePath, 'utf-8')
+    // for (const file of migrationFiles) {
+    //   const filePath = path.join(this.migrationsPath, file)
+    //   const sql = fs.readFileSync(filePath, 'utf-8')
 
-      this.db.run(sql, (err) => {
-        if (err) throw err
-      })
-    }
+    //   this.db.run(sql, (err) => {
+    //     if (err) throw err
+    //   })
+    // }
   }
 
   getDb(): sqlite3.Database {
