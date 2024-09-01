@@ -17,7 +17,7 @@ export class DatabaseService {
   }
 
   async setUpDb(): Promise<void> {
-    this.db = new sqlite3.Database(this.databasePath)
+    // this.db = new sqlite3.Database(this.databasePath)
 
     // TODO Implement when a db is needed
     // let migrationFiles = fs.readdirSync(this.migrationsPath)
