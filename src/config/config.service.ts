@@ -2,6 +2,19 @@ import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class ConfigService {
+  AI: {
+    EMBEDDING: {
+      MODEL: string
+      DIMENSIONS: number
+      BUFFER_SIZE: number
+      BREAKPOINT_PERCENTILE_THRESHOLD: number
+    }
+    CHAT: {
+      MODEL: string
+      TEMPERATURE: number
+      TOP_K: number
+    }
+  }
   AI_MANAGER: {
     API_URL: string
     API_AUTH_USER: string
@@ -15,7 +28,6 @@ export class ConfigService {
     PATH: string
     MIGRATIONS_PATH: string
   }
-  EMBEDDING_MODEL_DEFAULT: string
   LLAMA_CLOUD: { API_KEY: string; API_URL: string }
   STORAGE: {
     AWS_ACCESS_KEY_ID: string
@@ -26,6 +38,21 @@ export class ConfigService {
   }
 
   constructor() {
+    this.AI = {
+      EMBEDDING: {
+        MODEL: this.getOrThrow('AI_EMBEDDING_MODEL'),
+        DIMENSIONS: parseInt(this.getOrThrow('AI_EMBEDDING_DIMENSIONS')),
+        BUFFER_SIZE: parseInt(this.getOrThrow('AI_EMBEDDING_BUFFER_SIZE')),
+        BREAKPOINT_PERCENTILE_THRESHOLD: parseInt(
+          this.getOrThrow('AI_EMBEDDING_BREAKPOINT_PERCENTILE_THRESHOLD')
+        ),
+      },
+      CHAT: {
+        MODEL: this.getOrThrow('AI_CHAT_MODEL'),
+        TEMPERATURE: parseFloat(this.getOrThrow('AI_CHAT_TEMPERATURE')),
+        TOP_K: parseInt(this.getOrThrow('AI_CHAT_TOP_K')),
+      },
+    }
     this.AI_MANAGER = {
       API_URL: this.getOrThrow('ENSCLI_AI_MANAGER_URL'),
       API_AUTH_USER: this.getOrThrow('ENSCLI_AI_MANAGER_BASIC_AUTH_USER'),
@@ -41,7 +68,6 @@ export class ConfigService {
       USERS: this.getOrThrow('BASIC_AUTH_USERS'),
       PASSWORD: this.getOrThrow('BASIC_AUTH_PASSWORD'),
     }
-    this.EMBEDDING_MODEL_DEFAULT = this.getOrThrow('EMBEDDING_MODEL_DEFAULT')
     this.LLAMA_CLOUD = {
       API_KEY: this.getOrThrow('LLAMA_CLOUD_API_KEY'),
       API_URL: this.getOrThrow('LLAMA_CLOUD_API_URL'),

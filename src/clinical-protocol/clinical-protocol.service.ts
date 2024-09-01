@@ -1,9 +1,10 @@
 import { MultipartFile } from '@fastify/multipart'
 import { Injectable } from '@nestjs/common'
-import { EmbedService } from '../embed'
+import { AiManagerService } from '../ai-manager'
 import { ParserService } from '../parser'
 import { StorageService } from '../storage'
 import {
+  ClinicalProtocolChatDto,
   ClinicalProtocolEmbedDto,
   ClinicalProtocolParseDto,
   ClinicalProtocolSubmitDto,
@@ -14,7 +15,7 @@ export class ClinicalProtocolService {
   constructor(
     private readonly storageService: StorageService,
     private readonly parserService: ParserService,
-    private readonly embedService: EmbedService
+    private readonly aiManagerService: AiManagerService
   ) {}
 
   async upload(projectName: string, file: MultipartFile) {
@@ -53,10 +54,10 @@ export class ClinicalProtocolService {
     const filePath = `${projectName}/${dto.filename}`
     const fileBuffer = await this.storageService.downloadFile(filePath)
 
-    await this.embedService.embed(
-      new Blob([fileBuffer]),
-      projectName,
-      dto.model
-    )
+    await this.aiManagerService.embed(new Blob([fileBuffer]), projectName)
+  }
+
+  async chat(projectName: string, dto: ClinicalProtocolChatDto) {
+    return this.aiManagerService.chat(projectName, dto.message, dto.sessionId)
   }
 }

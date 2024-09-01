@@ -5,13 +5,16 @@ import {
   Controller,
   Param,
   Post,
+  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
+import { AiManagerFilter } from '../ai-manager'
 import { AuthGuard } from '../auth'
 import { MultipartData, MultipartInterceptor } from '../multipart'
 import { ClinicalProtocolService } from './clinical-protocol.service'
 import {
+  ClinicalProtocolChatDto,
   ClinicalProtocolEmbedDto,
   ClinicalProtocolParseDto,
   ClinicalProtocolSubmitDto,
@@ -144,6 +147,7 @@ export class ClinicalProtocolController {
   }
 
   @Post('/:project/embed')
+  @UseFilters(AiManagerFilter)
   async postClinicalProtocolProjectNameEmbed(
     @Param('project') projectName: string,
     @Body() dto: ClinicalProtocolEmbedDto
@@ -153,6 +157,15 @@ export class ClinicalProtocolController {
 
     await this.clinicalProtocolService.embed(projectName, dto)
     return { success: true }
+  }
+
+  @Post('/:project/chat')
+  @UseFilters(AiManagerFilter)
+  async postClinicalProtocolProjectNameChat(
+    @Param('project') projectName: string,
+    @Body() dto: ClinicalProtocolChatDto
+  ) {
+    return this.clinicalProtocolService.chat(projectName, dto)
   }
 
   private checkFileExtension(filename?: string) {
