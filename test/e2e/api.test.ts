@@ -18,6 +18,6 @@ describe('api e2e', () => {
     const res = await request(app.getHttpServer()).get('/health')
 
     expect(res.status).toBe(200)
-    expect(res.body).toEqual({ status: 'UP' })
+    expect(res.body).toEqual({ status: 'up' })
   })
 })

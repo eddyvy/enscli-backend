@@ -18,7 +18,6 @@ export class DatabaseService {
 
   async setUpDb(): Promise<void> {
     // this.db = new sqlite3.Database(this.databasePath)
-
     // TODO Implement when a db is needed
     // let migrationFiles = fs.readdirSync(this.migrationsPath)
     // migrationFiles = migrationFiles.sort((a, b) => {
@@ -26,11 +25,9 @@ export class DatabaseService {
     //   const bNum = parseInt(b.split('_')[0], 10)
     //   return aNum - bNum
     // })
-
     // for (const file of migrationFiles) {
     //   const filePath = path.join(this.migrationsPath, file)
     //   const sql = fs.readFileSync(filePath, 'utf-8')
-
     //   this.db.run(sql, (err) => {
     //     if (err) throw err
     //   })
